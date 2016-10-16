@@ -9,7 +9,7 @@ class SoftmaxRegression {
    * @param {Object} args These are the required arguments.
    */
   constructor(args) {
-    if (args.notify_count === undefined || args.threshold === undefined || args.batch_size === undefined || args.learningRate === undefined || args.parameter_size === undefined || args.max_iterations === undefined || args.iteration_callback === undefined) {
+    if (args.notify_count === undefined || args.threshold === undefined || args.momentum === undefined || args.batch_size === undefined || args.learningRate === undefined || args.parameter_size === undefined || args.max_iterations === undefined || args.iteration_callback === undefined) {
       throw ({
         'name': "InvalidParam",
         'message': "The required constructor parameters cannot be empty."
@@ -18,6 +18,7 @@ class SoftmaxRegression {
     this.MathJS = require('mathjs');
     this.initArgs = args;
     this.batch_size = this.initArgs.batch_size;
+    this.momentum = this.initArgs.momentum;
     this.notify_count = this.initArgs.notify_count || 100;
     this.max_iterations = this.initArgs.max_iterations || 1000;
     this.iteration_callback = this.initArgs.iteration_callback;
@@ -196,14 +197,14 @@ class SoftmaxRegression {
     var self = this;
     this.W = this.MathJS.random(this.MathJS.matrix([self.parameter_size[1], self.parameter_size[0]]), -1,1);
     var scope = {};
-        scope.v =  this.MathJS.random(this.MathJS.matrix([self.parameter_size[1], self.parameter_size[0]]), 0,0);
+        scope.v =  this.MathJS.random(this.MathJS.matrix([self.parameter_size[1], self.parameter_size[0]]), 0,0);//zeros
 
     while (true) {
       
       this.W._data[0] = this.MathJS.zeros(1, self.parameter_size[0])._data[0];
       scope.X = this.MathJS.matrix(this.X._data.slice(counter,counter+this.batch_size));
       scope.W = this.W;
-      scope.gamma = 0.5;
+      scope.gamma = this.momentum;
       scope.cost = this.costFunction(undefined, scope.X, undefined);
       scope.gradient = this.costFunctionGradient(undefined, scope.X, undefined);
       scope.iterations = iterations;
@@ -237,19 +238,20 @@ var mathjs = require('mathjs');
 
 var callback = function(data) {
 
-  console.log(data.cost);
+  console.log(data.cost, data.iterations);
 };
 
 var sft = new SoftmaxRegression({
-  'notify_count': 1,
-  'parameter_size': [1, 3],//[depth of each class, total number of classes]
-  'max_iterations': 10000000,
+  'notify_count': 10,
+  'momentum': 0.5,
+  'parameter_size': [1, 5],//[depth of each class, total number of classes]
+  'max_iterations': 1000000000,
   'threshold': 0.1,
-  'batch_size': 3,
+  'batch_size': 10,
   'iteration_callback': callback,
-  'learningRate': 0.5,
+  'learningRate': 0.005,
   'regularization_parameter': 0.0001
 });
 
 
-sft.startRegression(mathjs.floor(mathjs.random(mathjs.matrix([100, 1]), 1, 2)), mathjs.floor(mathjs.random(mathjs.matrix([100, 1]), 2, 4)));
+sft.startRegression(mathjs.floor(mathjs.random(mathjs.matrix([10000, 1]), 0, 2)), mathjs.floor(mathjs.random(mathjs.matrix([10000, 1]), 2, 14)));
