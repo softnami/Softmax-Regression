@@ -251,7 +251,7 @@ var sft = new SoftmaxRegression({
   'parameter_size': [1, 5],//[depth of each class, total number of classes]
   'max_iterations': 1000000000,
   'threshold': 0.1,
-  'batch_size': 25,
+  'batch_size': 10,
   'iteration_callback': callback,
   'learningRate': 0.005,
   'regularization_parameter': 0.0001
