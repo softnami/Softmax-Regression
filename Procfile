@@ -1,1 +1,1 @@
-web: node softmax.js server.js
+web: node  server.js softmax.js
