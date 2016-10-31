@@ -195,9 +195,10 @@ class SoftmaxRegression {
     this.X = X;
     this.Y = Y;
     var self = this;
-    this.W = this.MathJS.random(this.MathJS.matrix([self.parameter_size[1], self.parameter_size[0]]), -1,1);
+    this.W = this.MathJS.random(this.MathJS.matrix([self.parameter_size[1], self.parameter_size[0]]), 0.001,0.05);
     var scope = {};
         scope.v =  this.MathJS.random(this.MathJS.matrix([self.parameter_size[1], self.parameter_size[0]]), 0,0);//zeros
+        scope.cost = 0;
 
     while (true) {
       
@@ -213,6 +214,7 @@ class SoftmaxRegression {
       this.W = this.MathJS.eval('W-v', scope); 
 
       if (iterations % this.notify_count === 0) {
+        scope.cost = scope.cost;
         this.iteration_callback(scope);
       }
 
@@ -223,7 +225,7 @@ class SoftmaxRegression {
         counter = 0;
       }
 
-      if (iterations > this.max_iterations || scope.cost < this.threshold) {
+      if (iterations > this.max_iterations || (scope.cost < this.threshold)) {
         console.log("\nTraining completed.\n");
         break;
       }
@@ -234,20 +236,22 @@ class SoftmaxRegression {
 
 }
 
-var mathjs = require('mathjs');
+module.exports = SoftmaxRegression;
 
+
+var mathjs = require('mathjs');
 var callback = function(data) {
 
-  console.log(data.cost, data.iterations);
+  console.log(data.cost, data.iterations, data.W);
 };
 
 var sft = new SoftmaxRegression({
-  'notify_count': 10,
+  'notify_count': 1000,
   'momentum': 0.5,
   'parameter_size': [1, 5],//[depth of each class, total number of classes]
   'max_iterations': 1000000000,
   'threshold': 0.1,
-  'batch_size': 10,
+  'batch_size': 25,
   'iteration_callback': callback,
   'learningRate': 0.005,
   'regularization_parameter': 0.0001
