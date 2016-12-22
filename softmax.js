@@ -9,7 +9,7 @@ class SoftmaxRegression {
    * @param {Object} args These are the required arguments.
    */
   constructor(args) {
-    if (args.notify_count === undefined || args.threshold === undefined || args.momentum === undefined || args.batch_size === undefined || args.learningRate === undefined || args.parameter_size === undefined || args.max_iterations === undefined || args.iteration_callback === undefined) {
+    if (args.notify_count === undefined || args.weight_initialization_range === undefined || args.threshold === undefined || args.momentum === undefined || args.batch_size === undefined || args.learningRate === undefined || args.parameter_size === undefined || args.max_iterations === undefined || args.iteration_callback === undefined) {
       throw ({
         'name': "InvalidParam",
         'message': "The required constructor parameters cannot be empty."
@@ -21,6 +21,7 @@ class SoftmaxRegression {
     this.momentum = this.initArgs.momentum;
     this.notify_count = this.initArgs.notify_count || 100;
     this.max_iterations = this.initArgs.max_iterations || 1000;
+    this.weight_initialization_range = this.initArgs.weight_initialization_range;
     this.iteration_callback = this.initArgs.iteration_callback;
     this.parameter_size = this.initArgs.parameter_size;
     this.learningRate = this.initArgs.learningRate;
@@ -43,7 +44,7 @@ class SoftmaxRegression {
   exp_matrix(W, X) {
 
     var scope = {
-        x: X[0],
+        x: this.MathJS.matrix(X),
         W: (typeof(W) === "number") ? this.MathJS.matrix([
           [W]
         ]) : this.W,
@@ -51,8 +52,7 @@ class SoftmaxRegression {
       },
       exp_term;
 
-    scope.W_transpose = this.MathJS.transpose(scope.W);
-    exp_term = this.MathJS.eval('e.^((W_transpose*x))', scope);
+    exp_term = this.MathJS.eval('e.^(x*W)', scope);
 
     return exp_term;
   }
@@ -70,7 +70,9 @@ class SoftmaxRegression {
       exp_term: exp_term,
       sum: sum
     };
-    var result = this.MathJS.eval('exp_term.*(1/sum)', scope);
+
+    var result = this.MathJS.eval('exp_term.*(1/sum)', scope),
+      num;
 
     return result;
   }
@@ -94,20 +96,13 @@ class SoftmaxRegression {
 
     var scope = {};
     scope.cost = 0;
+    scope.cost_n = 0;
+    exp_matrix = this.exp_matrix(W, X);
 
-    for (let i = 0; i < X.size()[0]; i++) {
-      exp_matrix = this.exp_matrix(W, X._data[i]);
-      probability_matrx[i] = this.hypothesis(exp_matrix)._data;
-    }
 
-    for (let j = 0; j < W.size()[0]-1; j++) {
-      for (let n = 0; n < X.size()[0]; n++) {
-        if (Y._data[n][0] === j) {
-          scope.p_matrx = (probability_matrx[n][0][j]);
-          scope.cost = this.MathJS.eval('cost + log(p_matrx)', scope);
-        }
-      }
-    }
+    scope.p_matrx = this.MathJS.transpose(this.hypothesis(exp_matrix));
+    scope.y = (Y);
+    scope.cross_entropy = this.MathJS.eval('-1*(log(p_matrx))*y', scope);
 
     scope.size = X.size()[0];
     scope.W = W;
@@ -115,10 +110,10 @@ class SoftmaxRegression {
     scope.regularization_constant = this.regularization_parameter;
     scope.regularization_matrix = this.MathJS.eval('(regularization_constant/ 2) * weights_sum', scope);
 
-    var finalcost = this.MathJS.eval('(-1*cost./size)+regularization_matrix', scope);
+    scope.cross_entropy = this.MathJS.eval('cross_entropy+regularization_matrix', scope);
+    scope.cost = 0.5 * this.MathJS.mean(scope.cross_entropy);
 
-
-    return this.MathJS.sum(finalcost);
+    return scope.cost;
   }
 
   /**
@@ -134,52 +129,77 @@ class SoftmaxRegression {
   costFunctionGradient(_W, _X, _Y) {
     var cost = 0;
     var gradient = [],
-      probability_matrx = [
-        []
-      ],
+      probability_matrx = [],
       exp_matrix;
     var X = _X || this.X;
     var Y = _Y || this.Y;
     var W = _W || this.W;
+    W = this.MathJS.squeeze(W);
 
     for (let i = 0; i < X.size()[0]; i++) {
       exp_matrix = this.exp_matrix(W, X._data[i]);
-      probability_matrx[i] = this.MathJS.transpose(this.hypothesis(exp_matrix))._data;
+      probability_matrx[i] = (this.hypothesis(exp_matrix))._data;
     }
 
-    for (let j = 0; j < W.size()[0]; j++) {
-      let scope = {};
-      scope.gradient_previous = this.MathJS.zeros(W.size()[0], W.size()[1]);
-
-      scope.gradient = [];
-      scope.gradient[j] = [];
-      for (let i = 0; i < X.size()[0]; i++) {
-        scope.x = X._data[i][0];
-        if (Y._data[i][0] === j) {
-          scope.probability_matrx = (probability_matrx[i]);
-          scope.gradient[j][i] = this.MathJS.eval('(1-probability_matrx).*x', scope);
-        } else if (Y._data[i][0] !== j) {
-          scope.probability_matrx = (probability_matrx[i]);
-          scope.gradient[j][i] = this.MathJS.eval('(probability_matrx.*-1).*x', scope);
-        }
-
-        scope.gradient_current = this.MathJS.matrix(scope.gradient[j][i]);
-        gradient[j] = this.MathJS.eval('(gradient_current+gradient_previous)', scope)._data;//Summing up gradients for all examples for a certain class j.
-        scope.gradient_previous = gradient[j];
-      }
-    }
-
-
+    // w-> n_feat x n_classes
     let scope = {};
-    scope.gradient = gradient[0];
+    scope.gradient = [];
+
+    scope.probability_matrx = this.MathJS.squeeze(this.MathJS.matrix(probability_matrx));
+    scope.y = this.MathJS.matrix(Y);
+    scope.x = this.MathJS.transpose(X); //num of features * num of samples
+    scope.difference = this.MathJS.eval('probability_matrx-y', scope); //num of samples x num of classes
+    scope.gradient = this.MathJS.multiply(scope.x, scope.difference); //number of features x number of classes
+
     scope.size = X.size()[0];
     scope.regularization_constant = this.regularization_parameter;
     scope.W = W;
-    scope.regularization_matrix = this.MathJS.eval('W.*regularization_constant', scope);
+    scope.regularization_matrix = this.MathJS.squeeze(this.MathJS.eval('W.*regularization_constant', scope));
 
+    for (let i = 0; i < this.X.size()[0]; i++) {
+      this.X._data[i][0] = this.X._data[i][0] - (this.learningRate * this.MathJS.sum(scope.difference));
+    }
 
-    return this.MathJS.eval('(-1*gradient./size)+regularization_matrix', scope);
+    return this.MathJS.eval('(gradient)+regularization_matrix', scope);
   }
+
+  /**
+   * This method serves as the logic for validating X, Y and the Weights(W).
+   *
+   * @method validateXYW
+   **/
+  validateXYW() {
+    var self = this;
+
+    if (self.X.size()[1] != self.W.size()[0]) {
+      throw ({
+        'name': "Invalid size",
+        'message': "The number of columns in X should be equal to the number of rows in parameter_size."
+      });
+    }
+
+    if (self.Y.size()[1] != self.W.size()[1]) {
+      throw ({
+        'name': "Invalid size",
+        'message': "The number of columns in Y should be equal to the number of columns in parameter_size."
+      });
+    }
+
+    if (self.Y.size()[0] != self.X.size()[0]) {
+      throw ({
+        'name': "Invalid size",
+        'message': "The number of rows in X should be equal to the number of rows in Y."
+      });
+    }
+
+    if (!(self.Y.size()[0] > 2) || !(self.X.size()[0] > 2)) {
+      throw ({
+        'name': "Invalid size",
+        'message': "The number of rows in X andy Y should be greater than 2."
+      });
+    }
+  }
+
 
   /**
    * This method serves as the logic for the gradient descent.
@@ -189,39 +209,44 @@ class SoftmaxRegression {
    * @param {matrix} X The matrix to be used as the input data for training.
    */
   startRegression(X, Y) {
-
-    var iterations = 0, counter = 0;
+    var iterations = 0,
+      counter = 0;
+    var scope = {};
 
     this.X = X;
     this.Y = Y;
     var self = this;
-    this.W = this.MathJS.random(this.MathJS.matrix([self.parameter_size[1], self.parameter_size[0]]), 0.001,0.05);
-    var scope = {};
-        scope.v =  this.MathJS.random(this.MathJS.matrix([self.parameter_size[1], self.parameter_size[0]]), 0,0);//zeros
-        scope.cost = 0;
+    this.W = this.MathJS.random(this.MathJS.matrix([self.parameter_size[0], self.parameter_size[1]]), -5, 5);
+    scope.ranmatrx = this.MathJS.random(this.MathJS.matrix([self.parameter_size[0], self.parameter_size[1]]), -0.9, 0.001);
+    scope.W = this.W;
+    this.W = this.MathJS.eval('ranmatrx.*W', scope);
+    scope.cost = 0;
+    scope.v = this.MathJS.random(this.MathJS.matrix([self.parameter_size[0], self.parameter_size[1]]), 0, 0);
+
+    this.validateXYW();
 
     while (true) {
-      
-      this.W._data[0] = this.MathJS.zeros(1, self.parameter_size[0])._data[0];
-      scope.X = this.MathJS.matrix(this.X._data.slice(counter,counter+this.batch_size));
-      scope.W = this.W;
+
+      this.W._data[0] = this.MathJS.zeros(1, self.parameter_size[1])._data[0];
+      scope.X = this.MathJS.matrix(this.X._data.slice(counter * this.batch_size, counter * this.batch_size + this.batch_size));
+      scope.Y = this.MathJS.matrix(this.Y._data.slice(counter * this.batch_size, counter * this.batch_size + this.batch_size));
       scope.gamma = this.momentum;
-      scope.cost = this.costFunction(undefined, scope.X, undefined);
-      scope.gradient = this.costFunctionGradient(undefined, scope.X, undefined);
+      scope.cost = this.costFunction(undefined, scope.X, scope.Y);
+      scope.gradient = this.costFunctionGradient(undefined, scope.X, scope.Y);
       scope.iterations = iterations;
       scope.learningRate = this.learningRate;
-      scope.v = this.MathJS.eval('(gamma*v)+(gradient.*learningRate)',scope);//momentum for Stochastic Gradient Descent.
-      this.W = this.MathJS.eval('W-v', scope); 
+      scope.v = this.MathJS.eval('(gamma*v)+(gradient.*learningRate)', scope); //momentum for Stochastic Gradient Descent.
+      this.W = this.MathJS.eval('W-v', scope);
+      scope.W = this.W;
 
       if (iterations % this.notify_count === 0) {
-        scope.cost = scope.cost;
         this.iteration_callback(scope);
       }
 
       iterations++;
-      counter=counter+this.batch_size;
+      counter++;
 
-      if(counter>this.X.size()[0]-11){
+      if ((counter * this.batch_size + this.batch_size) > this.X.size()[0]) {
         counter = 0;
       }
 
@@ -237,25 +262,3 @@ class SoftmaxRegression {
 }
 
 module.exports = SoftmaxRegression;
-
-
-var mathjs = require('mathjs');
-var callback = function(data) {
-
-  console.log(data.cost, data.iterations, data.W);
-};
-
-var sft = new SoftmaxRegression({
-  'notify_count': 1000,
-  'momentum': 0.5,
-  'parameter_size': [1, 5],//[depth of each class, total number of classes]
-  'max_iterations': 1000000000,
-  'threshold': 0.1,
-  'batch_size': 10,
-  'iteration_callback': callback,
-  'learningRate': 0.005,
-  'regularization_parameter': 0.0001
-});
-
-
-sft.startRegression(mathjs.floor(mathjs.random(mathjs.matrix([10000, 1]), 0, 2)), mathjs.floor(mathjs.random(mathjs.matrix([10000, 1]), 2, 14)));
