@@ -45,6 +45,7 @@ class SoftmaxRegression {
 
     var scope = {
         x: this.MathJS.matrix(X),
+        bias: this.MathJS.matrix(X).size().length===1?this.bias._data[0]:this.bias,
         W: (typeof(W) === "number") ? this.MathJS.matrix([
           [W]
         ]) : this.W,
@@ -52,7 +53,7 @@ class SoftmaxRegression {
       },
       exp_term;
 
-    exp_term = this.MathJS.eval('e.^(x*W)', scope);
+    exp_term = this.MathJS.eval('e.^(x*W+bias)', scope);
 
     return exp_term;
   }
@@ -150,15 +151,19 @@ class SoftmaxRegression {
     scope.x = this.MathJS.transpose(X); //num of features * num of samples
     scope.difference = this.MathJS.eval('probability_matrx-y', scope); //num of samples x num of classes
     scope.gradient = this.MathJS.multiply(scope.x, scope.difference); //number of features x number of classes
+    scope.difference_mean = this.MathJS.mean(scope.difference,0);
+    scope.difference_mean = this.MathJS.matrix([scope.difference_mean]);
+    scope.ones = this.MathJS.ones(this.batch_size, 1);
+    scope.size = scope.difference.size()[0];
+    scope.learningRate = this.learningRate;
+    scope.bias = this.bias;
+
+    this.bias = this.MathJS.eval('bias-ones*difference_mean*size*learningRate',scope));
 
     scope.size = X.size()[0];
     scope.regularization_constant = this.regularization_parameter;
     scope.W = W;
     scope.regularization_matrix = this.MathJS.squeeze(this.MathJS.eval('W.*regularization_constant', scope));
-
-    for (let i = 0; i < this.X.size()[0]; i++) {
-      this.X._data[i][0] = this.X._data[i][0] - (this.learningRate * this.MathJS.sum(scope.difference));
-    }
 
     return this.MathJS.eval('(gradient)+regularization_matrix', scope);
   }
@@ -217,6 +222,7 @@ class SoftmaxRegression {
     this.Y = Y;
     var self = this;
     this.W = this.MathJS.random(this.MathJS.matrix([self.parameter_size[0], self.parameter_size[1]]), -5, 5);
+    this.bias = this.MathJS.ones(self.batch_size, self.parameter_size[1]);
     scope.ranmatrx = this.MathJS.random(this.MathJS.matrix([self.parameter_size[0], self.parameter_size[1]]), -0.9, 0.001);
     scope.W = this.W;
     this.W = this.MathJS.eval('ranmatrx.*W', scope);
@@ -262,3 +268,4 @@ class SoftmaxRegression {
 }
 
 module.exports = SoftmaxRegression;
+
