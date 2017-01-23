@@ -158,7 +158,7 @@ class SoftmaxRegression {
     scope.learningRate = this.learningRate;
     scope.bias = this.bias;
 
-    this.bias = this.MathJS.eval('bias-ones*difference_mean*size*learningRate',scope));
+    this.bias = this.MathJS.eval('bias-ones*difference_mean*size*learningRate',scope);
 
     scope.size = X.size()[0];
     scope.regularization_constant = this.regularization_parameter;
