@@ -103,6 +103,18 @@ class SoftmaxRegression {
 
     scope.p_matrx = this.MathJS.transpose(this.hypothesis(exp_matrix));
     scope.y = (Y);
+
+    scope.p_matrx = scope.p_matrx.map(function(value) { //case for numerical instability.
+      if (value < 0.001) {
+        return 0.001;
+      }
+      if (value >= 1) {
+        return 0.999;
+      }
+
+      return value;
+    });
+
     scope.cross_entropy = this.MathJS.eval('-1*(log(p_matrx))*y', scope);
 
     scope.size = X.size()[0];
