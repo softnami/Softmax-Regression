@@ -33,27 +33,30 @@ class SoftmaxRegression {
     this.W = {};
   }
 
-  /**
-   * This method serves as the logic for generating the natural exponent matrix in softmax regression.
+   /**
+   * This method serves as the logic for generating the natural exponent matrix in softmax.
    *
    * @method exp_matrix
-   * @param {matrix} W The matrix to be used as the weights for the exp_matrix.
-   * @param {matrix} X The matrix to be used as the input data for the exp_matrix.
-   * @return {matrix} exp_term Returns the exp_term matrix.
+   * @param {matrix} _W The matrix to be used as the weights for the exp_matrix.
+   * @param {matrix} _X The matrix to be used as the input data for the exp_matrix.
+   * @return {matrix} Returns the exp_term matrix.
    */
-  exp_matrix(W, X) {
+  exp_matrix(_W, _X) {
 
-    var scope = {
-        x: this.MathJS.matrix(X),
-        bias: this.MathJS.matrix(X).size().length===1?this.bias._data[0]:this.bias,
-        W: (typeof(W) === "number") ? this.MathJS.matrix([
-          [W]
-        ]) : this.W,
-        W_transpose: {}
+    let W = (typeof(_W) === "number") ? this.MathJS.matrix(
+      _W
+    ) : this.W;
+    let scope = {
+        x: _X,
+        W: (W),
+        max: 0
       },
-      exp_term;
+      exp_term, product;
 
-    exp_term = this.MathJS.eval('e.^(x*W+bias)', scope);
+    product = this.MathJS.eval('(x*W)', scope);
+    scope.max = this.MathJS.max(product);
+    scope.product = product;
+    exp_term = this.MathJS.eval('e.^(product-max)', scope);
 
     return exp_term;
   }
@@ -63,20 +66,26 @@ class SoftmaxRegression {
    *
    * @method hypothesis
    * @param {matrix} exp_term The matrix to be used as the exp_term.
-   * @return {matrix} result Returns the hypothesis matrix.
+   * @return {matrix} Returns the hypothesis matrix.
    */
   hypothesis(exp_term) {
-    var sum = this.MathJS.sum(exp_term);
-    var scope = {
+
+    let sum = this.MathJS.mean(exp_term,0);
+    let scope = {
       exp_term: exp_term,
-      sum: sum
+      sum: sum,
+      ones: {},
+      size: sum.size()[0]
     };
 
-    var result = this.MathJS.eval('exp_term.*(1/sum)', scope),
-      num;
+        scope.ones = this.MathJS.squeeze(this.MathJS.ones(1, scope.exp_term.size()[1]));
+        scope.sum = this.MathJS.eval('sum*ones*size',scope);
+        let result = this.MathJS.eval('exp_term.*(1/(sum))', scope);
 
     return result;
   }
+
+
 
   /**
    * This method serves as the logic for the costFunction.
