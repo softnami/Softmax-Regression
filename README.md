@@ -3,33 +3,31 @@
 var mathjs = require('mathjs');
 var epoch = 1;
 var callback = function(data) {
-  if (data.iterations*25%10000 === 0) {
     console.timeEnd('timer');
     console.log("Cost: "+data.cost,"Epoch :"+epoch);
     epoch++;
     console.time('timer');
-  }
 };
 
 var sft = new SoftmaxRegression({
   'notify_count': 1,
-  'momentum': 0.9,
-  'parameter_size': [256, 15], //[number of  input features, total number of  output classes]
+  'momentum': 0.5,
+  'parameter_size': [784, 30], //[number of  input features, total number of  output classes]
   'max_iterations': 1000000000,
-  'weight_initialization_range': [-0.00000000001, 0.00000000001],
+  'weight_initialization_range': [-0.0005, 0.0005],
   'threshold': 0.1,
-  'batch_size': 25,
+  'batch_size': 10000,
   'decay_constant': 5,
   'iteration_callback': callback,
-  'learningRate': 0.001,
-  'regularization_parameter': Math.exp(-3)
+  'learningRate': 0.003,
+  'regularization_parameter': Math.exp(-4)
 });
 
 var sample_y = []; //one-hot encoded classes: [1,2,3] -> [[1, 0,0],[0, 1,0],[0, 0,1]]
 
-for(let i =0 ; i< 15; i++){
+for(let i =0 ; i< 30; i++){
   sample_y[i] = [];
-  for(let j =0; j< 15; j++){
+  for(let j =0; j< 30; j++){
     if(i==j){
       sample_y[i][j]= 1;
     }
@@ -41,15 +39,15 @@ for(let i =0 ; i< 15; i++){
 
 
 var y = [],
-  num;
+  num = 0;
 
 
 for (let i = 0; i < 10000; i++) {
-  num = Math.floor((Math.random() * 15) + 0);
+  num = Math.floor((Math.random() * 13) + 0);
   y.push(sample_y[num]);
 }
 
-var x = mathjs.floor((mathjs.random(mathjs.matrix([10000, 256]), 0, 2)));
+var x = (mathjs.random(mathjs.matrix([10000, 784]), -1, 1));
 
 console.time('timer');
 sft.startRegression(x, mathjs.matrix(y));
