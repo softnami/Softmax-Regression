@@ -1,5 +1,8 @@
 "use strict";
 
+let window_object = (function(g){
+      return g;
+  }(this));
 
 class SoftmaxRegression {
 
@@ -9,18 +12,26 @@ class SoftmaxRegression {
    * @param {Object} args These are the required arguments.
    */
   constructor(args) {
-    if (args.notify_count === undefined || args.weight_initialization_range === undefined || args.threshold === undefined || args.momentum === undefined || args.batch_size === undefined || args.learningRate === undefined || args.parameter_size === undefined || args.max_iterations === undefined || args.iteration_callback === undefined) {
+    if (args.notify_count === undefined || args.weight_initialization_range === undefined || args.threshold === undefined || args.momentum === undefined || args.batch_size === undefined || args.learningRate === undefined || args.parameter_size === undefined || args.max_epochs === undefined || args.iteration_callback === undefined) {
       throw ({
         'name': "InvalidParam",
         'message': "The required constructor parameters cannot be empty."
       });
     }
+
+    if (Object.keys(window_object).length === 0) {
+      this.MathJS = require('mathjs');
+      this.q = require('q');
+    } else {
+      this.MathJS = math;
+      this.q = Q;
+    }
     this.MathJS = require('mathjs');
     this.initArgs = args;
     this.batch_size = this.initArgs.batch_size;
     this.momentum = this.initArgs.momentum;
-    this.notify_count = this.initArgs.notify_count || 100;
-    this.max_iterations = this.initArgs.max_iterations || 1000;
+    this.notify_count = this.initArgs.notify_count;
+    this.max_epochs = this.initArgs.max_epochs;
     this.weight_initialization_range = this.initArgs.weight_initialization_range;
     this.iteration_callback = this.initArgs.iteration_callback;
     this.parameter_size = this.initArgs.parameter_size;
@@ -39,22 +50,27 @@ class SoftmaxRegression {
    * @method exp_matrix
    * @param {matrix} _W The matrix to be used as the weights for the exp_matrix.
    * @param {matrix} _X The matrix to be used as the input data for the exp_matrix.
+   * @param {matrix} _bias The matrix to be used as the bias for the exp_matrix.
    * @return {matrix} Returns the exp_term matrix.
    */
-  exp_matrix(_W, _X) {
-
-    let W = (typeof(_W) === "number") ? this.MathJS.matrix(
-      _W
-    ) : this.W;
+  exp_matrix(_W, _X, _bias) {
     let scope = {
         x: _X,
-        W: (W),
-        bias: this.bias,
+        W: (_W||this.W),
+        bias: _bias || this.bias,
         max: 0
       },
       exp_term, product;
 
-    product = this.MathJS.eval('(x*W + bias)', scope);
+    if(scope.bias.size()[0]!==scope.x.size()[0]){
+      scope.ones =  this.MathJS.ones(scope.x.size()[0], scope.bias.size()[0]);
+      scope.resized_bias = this.MathJS.eval('ones*bias',scope);
+      this.bias = scope.resized_bias;
+      product = this.MathJS.eval('(x*W + resized_bias)', scope);
+    }else{
+      product = this.MathJS.eval('(x*W + bias)', scope);
+    }
+
     scope.max = this.MathJS.max(product);
     scope.product = product;
     exp_term = this.MathJS.eval('e.^(product-max)', scope);
@@ -92,18 +108,18 @@ class SoftmaxRegression {
    * This method serves as the logic for the costFunction.
    *
    * @method costFunction
-   * @param {matrix} W The matrix to be used as the weights.
-   * @param {matrix} X The matrix to be used as the input data.
-   * @param {matrix} Y The matrix to be used as the label data.
+   * @param {matrix} _W The matrix to be used as the weights.
+   * @param {matrix} _X The matrix to be used as the input data.
+   * @param {matrix} _Y The matrix to be used as the label data.
    * @return {Numer} Returns the cost.
    */
-  costFunction(W, X, Y) {
+  costFunction(_W, _X, _Y) {
 
     var cost = 0,
       exp_matrix, probability_matrx = [];
-    var W = W || this.W;
-    var X = X || this.X;
-    var Y = Y || this.Y;
+    var W = _W || this.W;
+    var X = _X || this.X;
+    var Y = _Y || this.Y;
 
     var scope = {};
     scope.cost = 0;
@@ -228,8 +244,117 @@ class SoftmaxRegression {
   }
 
 
+/**
+ * This method returns all the parameters passed to the constructor.
+ *
+ * @method getInitParams
+ * @return {Object} Returns the constructor parameters.
+ */
+getInitParams() {
+  return {
+    'notify_count': this.notify_count,
+    'momentum': this.momentum,
+    'parameter_size': this.parameter_size,
+    'max_epochs': this.max_epochs,
+    'weight_initialization_range': this.weight_initialization_range,
+    'threshold': this.threshold,
+    'learningRate': this.learningRate,
+    'batch_size': this.batch_size,
+    'regularization_parameter': this.regularization_parameter,
+    'max_epochs': this.max_epochs,
+    'iteration_callback': this.iteration_callback
+  };
+};
 
-      /**
+
+  /**
+ * This method serves as the logic for softmax function.
+ *
+ * @method process
+ * @param {matrix} X The matrix to be used as the input data.
+ * @param {matrix} W The matrix to be used as the weights.
+ * @return {matrix} Returns the softmax matrix.
+ */
+  predict(X, W, bias) {
+    let expMatrix;
+
+    this.setWeights();
+
+    let _X = X;
+    let _W = W || this.W;
+    let _bias = bias || this.bias;
+
+    expMatrix= this.exp_matrix(_W, _X, _bias);
+    
+    let softmaxMatrix = this.hypothesis(expMatrix);
+
+    return new Promise((resolve, reject) => {
+      resolve(softmaxMatrix);
+    });
+  }
+
+
+/**
+ *This method is responsible for setting bias for the Softmax model.
+ *
+ * @method setBias 
+ * @param {Number} bias The bias for Softmax model.
+ */
+setBias(bias) {
+  this.bias = bias;
+};
+
+
+/**
+ *This method is responsible for setting weights and biases for the Softmax from storage.
+ *
+ * @method setWeights 
+ * @return {Object} Returns a resolved promise after successfuly setting weights and biases.
+ */
+ setWeights(){
+  var self = this;
+  var weights, biases;
+  if (Object.keys(window_object).length === 0) {
+    weights = JSON.parse(global.localStorage.getItem("Weights"));
+    biases = JSON.parse(global.localStorage.getItem("Biases"));
+  } else {
+    weights = JSON.parse(localStorage.getItem("Weights"));
+    biases = JSON.parse(localStorage.getItem("Biases"));
+  }
+
+if(weights!==null && weights!==undefined){
+
+  self.W = this.MathJS.matrix(weights.data);
+  self.bias= this.MathJS.matrix(biases.data);
+  return [self.W._data, self.bias];
+}
+
+  return [];
+}
+
+
+  /**
+ *This method is responsible for saving the trained weights and biases for the Softmax.
+ *
+ * @method saveWeights 
+ * @param {Matrix} weights The weights for the Softmax model.
+ * @param {Matrix} biases The biases for the Softmax model.
+ * @return {Boolean} Returns true after succesfuly saving the weights.
+ */
+saveWeights(weights, biases) {
+  if (Object.keys(window_object).length === 0) {
+    global.localStorage.setItem("Weights", JSON.stringify(weights));
+    global.localStorage.setItem("Biases", JSON.stringify(biases));
+  } else {
+    localStorage.setItem("Weights", JSON.stringify(weights));
+    localStorage.setItem("Biases", JSON.stringify(biases));
+  }
+  console.log("\nWeights were successfuly saved.");
+  return true;
+}
+
+
+/**
 * Randomize matrix element order in-place.
 * Using Durstenfeld shuffle algorithm.
 */
@@ -265,9 +390,9 @@ class SoftmaxRegression {
     this.Y = Y;
     var self = this;
     this.W = this.MathJS.random(this.MathJS.matrix([self.parameter_size[0], self.parameter_size[1]]), this.weight_initialization_range[0], this.weight_initialization_range[1]);
-    this.bias = this.MathJS.ones(self.batch_size, self.parameter_size[1]);
+    this.bias = this.MathJS.matrix([this.MathJS.ones(self.parameter_size[1])._data]);
     scope.v = this.MathJS.random(this.MathJS.matrix([self.parameter_size[0], self.parameter_size[1]]), 0, 0);
-    
+    scope.epochs = 0;
     scope.W = this.W;
     scope.cost = 0;
     this.validateXYW();
@@ -286,8 +411,8 @@ class SoftmaxRegression {
       scope.iterations = iterations;
       scope.learningRate = this.learningRate;
       scope.bias = this.bias;
-  	  //scope.v = this.MathJS.eval('(v.*gamma)+(gradient.*learningRate)', scope); //momentum for Stochastic Gradient Descent.
-      this.W = this.MathJS.eval('W-(gradient.*learningRate)', scope);      
+  	  scope.v = this.MathJS.eval('(v.*gamma)+(gradient.*learningRate)', scope); //momentum for Stochastic Gradient Descent.
+      this.W = this.MathJS.eval('W-v', scope);      
       this.bias = this.MathJS.eval('bias-(bias_update.*learningRate)',scope);
       scope.W = this.W;
 
@@ -296,6 +421,7 @@ class SoftmaxRegression {
 
        if (((counter) * this.batch_size + this.batch_size) > this.X.size()[0]) {//cost for whole epoch.
         scope.cost = this.costFunction(undefined, scope.X, scope.Y);
+        scope.epochs++;
         this.iteration_callback(scope);
         var shuffled = this.shufflematrix(this.X._data, this.Y._data);
         this.X = this.MathJS.matrix(shuffled[0]);
@@ -303,17 +429,22 @@ class SoftmaxRegression {
          counter = 0;
       }
 
-
-      if (iterations > this.max_iterations || (scope.cost < this.threshold && scope.cost > 0)) {
+      if (scope.epochs > this.max_epochs || (scope.cost < this.threshold && scope.cost > 0)) {
         console.log("\nTraining completed.\n");
-        break;
+        this.saveWeights(this.W, this.bias);
+        return new Promise((resolve, reject) => {
+          resolve(scope);
+        });
       }
-
     }
-
   }
 
 }
 
-module.exports = SoftmaxRegression;
+if(Object.keys(window_object).length === 0){
+    module.exports = SoftmaxRegression;
+}else{
+    window['SoftmaxRegression'] = SoftmaxRegression;
+}
+
 
