@@ -14,7 +14,7 @@ class SoftmaxRegression {
   constructor(args) {
     if (args.notify_count === undefined || args.weight_initialization_range === undefined || args.threshold === undefined || args.momentum === undefined || args.batch_size === undefined || args.learningRate === undefined || args.parameter_size === undefined || args.max_epochs === undefined || args.iteration_callback === undefined) {
       throw ({
-        'name': "InvalidParam",
+        'name': "Invalid Param",
         'message': "The required constructor parameters cannot be empty."
       });
     }
@@ -144,7 +144,7 @@ class SoftmaxRegression {
 
     scope.cross_entropy = this.MathJS.eval('(y.*log(p_matrx))', scope);
     scope.size = X.size()[0];
-    scope.W = this.W;
+    scope.W = W;
     scope.weights_sum = this.MathJS.sum(this.MathJS.eval('W.^2', scope));
     scope.regularization_constant = this.regularization_parameter;
     scope.regularization_matrix = this.MathJS.eval('(regularization_constant/ 2) * weights_sum', scope);
@@ -306,7 +306,7 @@ setBias(bias) {
 
 
 /**
- *This method is responsible for setting weights and biases for the Softmax from storage.
+ *This method is responsible for setting weights and biases for the Softmax model from storage.
  *
  * @method setWeights 
  * @return {Object} Returns a resolved promise after successfuly setting weights and biases.
@@ -334,7 +334,7 @@ if(weights!==null && weights!==undefined){
 
 
   /**
- *This method is responsible for saving the trained weights and biases for the Softmax.
+ *This method is responsible for saving the trained weights and biases for the Softmax model.
  *
  * @method saveWeights 
  * @param {Matrix} weights The weights for the Softmax model.

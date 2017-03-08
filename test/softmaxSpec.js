@@ -34,7 +34,7 @@ describe('Softmax', function() {
 
   let callback = function(data) {
     callback_data = data;
-    console.log('Epochs:'+ data.epochs, 'iterations:'+ data.iterations, 'cost: '+ data.cost);
+    console.log('Epochs:' + data.epochs, 'iterations:' + data.iterations, 'cost: ' + data.cost);
   }
 
   let softmax = new Softmax({
@@ -236,18 +236,20 @@ describe('Softmax', function() {
     Y = mathjs.matrix(Y);
 
 
-    it("should correctly run costFunctionGradient()", function() {
-      var cost = 0;
-      var gradient = [],
+    it("should correctly run costFunctionGradient()", function(done) {
+      let cost = 0;
+      let success = true;
+      let gradient = [],
         probability_matrx = [],
         exp_matrix;
-      var X = _X || this.X;
-      var Y = _Y || this.Y;
-      var W = _W || this.W;
+
+      let W = (mathjs.random(mathjs.matrix([78, 12]), 0, 1)),
+        bias = mathjs.matrix([mathjs.ones(12)._data]);
+
       W = mathjs.squeeze(W);
 
-      exp_matrix = this.exp_matrix(W, X);
-      probability_matrx = (this.hypothesis(exp_matrix));
+      exp_matrix = softmax.exp_matrix(W, X);
+      probability_matrx = (softmax.hypothesis(exp_matrix));
 
       // w-> n_feat x n_classes
       let scope = {};
@@ -263,24 +265,49 @@ describe('Softmax', function() {
       scope.difference_mean = mathjs.mean(scope.difference, 0);
       scope.difference_mean = mathjs.matrix([scope.difference_mean]);
 
-      scope.ones = mathjs.ones(this.batch_size, 1);
+      scope.ones = mathjs.ones(25, 1);
       scope.size = scope.difference.size()[0];
-      scope.learningRate = this.learningRate;
+      scope.learningRate = getInitParams.learningRate;
 
       scope.bias_update = mathjs.eval('ones*difference_mean*size', scope);
 
       scope.size = X.size()[0];
-      scope.regularization_constant = this.regularization_parameter;
+      scope.regularization_constant = softmax.regularization_parameter;
       scope.W = W;
       scope.regularization_matrix = mathjs.squeeze(mathjs.eval('W.*regularization_constant', scope));
-      assert.equal(success, true);
+
+      let grad_computed = [mathjs.eval('(-1*gradient/size)+regularization_matrix', scope), scope.bias_update];
+
+      let grad_fromFunc = softmax.costFunctionGradient(W, X, Y);
+
+      for (let i = 0; i < grad_computed[0]._data.length; i++) { //checking gradient
+        for (let j = 0; j < grad_computed[0]._data[0].length; j++) {
+          if (grad_computed[0]._data[i][j] !== grad_fromFunc[0]._data[i][j]) {
+            success = false;
+            break;
+          }
+
+        }
+      }
+
+      for (let i = 0; i < grad_computed[1]._data.length; i++) { //checking bias_update
+        for (let j = 0; j < grad_computed[1]._data[0].length; j++) {
+          if (grad_computed[1]._data[i][j] !== grad_fromFunc[1]._data[i][j]) {
+            success = false;
+            break;
+          }
+        }
+      }
+
+      assert.deepStrictEqual(grad_computed, grad_fromFunc);
+      done();
 
     });
 
 
     it("should correctly run costFunction()", function() {
       let computed_cost = 0;
-      let success = false;
+      let success = true;
 
       let W = (mathjs.random(mathjs.matrix([78, 12]), -1, 1)),
         bias = mathjs.matrix([mathjs.ones(12)._data]);
@@ -322,8 +349,6 @@ describe('Softmax', function() {
       scope.cost = mathjs.sum(scope.regularization_matrix) - scope.cross_entropy;
       let cost_computed = softmax.costFunction(W, X, Y);
 
-      console.log(cost_computed, scope.cost);
-
       if (cost_computed !== scope.cost)
         success = false;
 
@@ -342,7 +367,6 @@ describe('Softmax', function() {
         spy.restore();
         assert.equal(success, true);
         done();
-
       });
 
     });
@@ -418,7 +442,7 @@ describe('Softmax', function() {
       done();
     });
 
-     it("should throw an exception if number of rows in Y(input) are not equal to the number of rows in X(input).", function(done) {
+    it("should throw an exception if number of rows in Y(input) are not equal to the number of rows in X(input).", function(done) {
       let success = false;
       let X = (mathjs.random(mathjs.matrix([255, 78]), 0, 1)),
         W = (mathjs.random(mathjs.matrix([78, 12]), 0, 1)),
@@ -448,7 +472,7 @@ describe('Softmax', function() {
 
       try {
         softmax.startRegression(X, Y);
-      } catch (err) { 
+      } catch (err) {
         if (err.name === "Invalid size" && err.message === "The number of rows in X should be equal to the number of rows in Y.") {
           success = true;
         }
@@ -489,7 +513,7 @@ describe('Softmax', function() {
 
       try {
         softmax.startRegression(X, Y);
-      } catch (err) { 
+      } catch (err) {
         if (err.name === "Invalid size" && err.message === "The number of columns in Y should be equal to the number of columns in parameter_size.") {
           success = true;
         }
@@ -529,7 +553,7 @@ describe('Softmax', function() {
 
       try {
         softmax.startRegression(X, Y);
-      } catch (err) { 
+      } catch (err) {
         if (err.name === "Invalid size" && err.message === "The number of rows in X andy Y should be greater than 2.") {
           success = true;
         }
@@ -539,7 +563,7 @@ describe('Softmax', function() {
       done();
     });
 
-    
+
 
     describe('when predicting the result', function() {
       let X = (mathjs.random(mathjs.matrix([256, 78]), 0, 1));

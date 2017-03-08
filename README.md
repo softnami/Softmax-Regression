@@ -13,7 +13,7 @@ var sft = new SoftmaxRegression({
   'notify_count': 1,
   'momentum': 0.5,
   'parameter_size': [784, 100], //[number of  input features, total number of  output classes]
-  'max_iterations': 1000000000,
+  'max_epochs': 1000000000,
   'weight_initialization_range': [-0.05, 0.05],
   'threshold': 0.1,
   'batch_size': 256,
