@@ -1,0 +1,265 @@
+{
+    "project": {},
+    "files": {
+        "softmax.js": {
+            "name": "softmax.js",
+            "modules": {},
+            "classes": {},
+            "fors": {},
+            "namespaces": {}
+        }
+    },
+    "modules": {},
+    "classes": {},
+    "elements": {},
+    "classitems": [
+        {
+            "file": "softmax.js",
+            "line": 9,
+            "description": "This method serves as the constructor for the SoftmaxRegression class.",
+            "itemtype": "method",
+            "name": "constructor",
+            "params": [
+                {
+                    "name": "args",
+                    "description": "These are the required arguments.",
+                    "type": "Object"
+                }
+            ],
+            "class": ""
+        },
+        {
+            "file": "softmax.js",
+            "line": 47,
+            "description": "This method serves as the logic for generating the natural exponent matrix in softmax.",
+            "itemtype": "method",
+            "name": "exp_matrix",
+            "params": [
+                {
+                    "name": "_W",
+                    "description": "The matrix to be used as the weights for the exp_matrix.",
+                    "type": "Matrix"
+                },
+                {
+                    "name": "_X",
+                    "description": "The matrix to be used as the input data for the exp_matrix.",
+                    "type": "Matrix"
+                },
+                {
+                    "name": "_bias",
+                    "description": "The matrix to be used as the bias for the exp_matrix.",
+                    "type": "Matrix"
+                }
+            ],
+            "return": {
+                "description": "Returns the exp_term matrix.",
+                "type": "Matrix"
+            },
+            "class": ""
+        },
+        {
+            "file": "softmax.js",
+            "line": 81,
+            "description": "This method serves as the logic for hypothesis.",
+            "itemtype": "method",
+            "name": "hypothesis",
+            "params": [
+                {
+                    "name": "exp_term",
+                    "description": "The matrix to be used as the exp_term.",
+                    "type": "Matrix"
+                }
+            ],
+            "return": {
+                "description": "Returns the hypothesis matrix.",
+                "type": "Matrix"
+            },
+            "class": ""
+        },
+        {
+            "file": "softmax.js",
+            "line": 107,
+            "description": "This method serves as the logic for the costFunction.",
+            "itemtype": "method",
+            "name": "costFunction",
+            "params": [
+                {
+                    "name": "_W",
+                    "description": "The matrix to be used as the weights.",
+                    "type": "Matrix"
+                },
+                {
+                    "name": "_X",
+                    "description": "The matrix to be used as the input data.",
+                    "type": "Matrix"
+                },
+                {
+                    "name": "_Y",
+                    "description": "The matrix to be used as the label data.",
+                    "type": "Matrix"
+                }
+            ],
+            "return": {
+                "description": "Returns the cost.",
+                "type": "Numer"
+            },
+            "class": ""
+        },
+        {
+            "file": "softmax.js",
+            "line": 158,
+            "description": "This method serves as the logic for the cost function gradient.",
+            "itemtype": "method",
+            "name": "costFunctionGradient",
+            "params": [
+                {
+                    "name": "_W",
+                    "description": "The matrix to be used as the weights.",
+                    "type": "Matrix"
+                },
+                {
+                    "name": "_X",
+                    "description": "The matrix to be used as the input data.",
+                    "type": "Matrix"
+                },
+                {
+                    "name": "_Y",
+                    "description": "The matrix to be used as the label data.",
+                    "type": "Matrix"
+                }
+            ],
+            "return": {
+                "description": "Returns the cost gradient.",
+                "type": "Matrix"
+            },
+            "class": ""
+        },
+        {
+            "file": "softmax.js",
+            "line": 209,
+            "description": "This method serves as the logic for validating X, Y and the Weights(W).",
+            "itemtype": "method",
+            "name": "validateXYW",
+            "class": ""
+        },
+        {
+            "file": "softmax.js",
+            "line": 247,
+            "description": "This method returns all the parameters passed to the constructor.",
+            "itemtype": "method",
+            "name": "getInitParams",
+            "return": {
+                "description": "Returns the constructor parameters.",
+                "type": "Object"
+            },
+            "class": ""
+        },
+        {
+            "file": "softmax.js",
+            "line": 270,
+            "description": "This method serves as the logic for softmax function.",
+            "itemtype": "method",
+            "name": "process",
+            "params": [
+                {
+                    "name": "X",
+                    "description": "The matrix to be used as the input data.",
+                    "type": "Matrix"
+                },
+                {
+                    "name": "W",
+                    "description": "The matrix to be used as the weights.",
+                    "type": "Matrix"
+                }
+            ],
+            "return": {
+                "description": "Returns the softmax matrix.",
+                "type": "Matrix"
+            },
+            "class": ""
+        },
+        {
+            "file": "softmax.js",
+            "line": 297,
+            "description": "This method is responsible for setting bias for the Softmax model.",
+            "itemtype": "method",
+            "name": "setBias",
+            "params": [
+                {
+                    "name": "bias",
+                    "description": "The bias for Softmax model.",
+                    "type": "Number"
+                }
+            ],
+            "class": ""
+        },
+        {
+            "file": "softmax.js",
+            "line": 308,
+            "description": "This method is responsible for setting weights and biases for the Softmax model from storage.",
+            "itemtype": "method",
+            "name": "setWeights",
+            "return": {
+                "description": "Returns a resolved promise after successfuly setting weights and biases.",
+                "type": "Object"
+            },
+            "class": ""
+        },
+        {
+            "file": "softmax.js",
+            "line": 336,
+            "description": "This method is responsible for saving the trained weights and biases for the Softmax model.",
+            "itemtype": "method",
+            "name": "saveWeights",
+            "params": [
+                {
+                    "name": "weights",
+                    "description": "The weights for the Softmax model.",
+                    "type": "Matrix"
+                },
+                {
+                    "name": "biases",
+                    "description": "The biases for the Softmax model.",
+                    "type": "Matrix"
+                }
+            ],
+            "return": {
+                "description": "Returns true after succesfuly saving the weights.",
+                "type": "Boolean"
+            },
+            "class": ""
+        },
+        {
+            "file": "softmax.js",
+            "line": 357,
+            "description": "Randomize matrix element order in-place.\nUsing Durstenfeld shuffle algorithm.",
+            "class": ""
+        },
+        {
+            "file": "softmax.js",
+            "line": 377,
+            "description": "This method serves as the logic for the gradient descent.",
+            "itemtype": "method",
+            "name": "startRegression",
+            "params": [
+                {
+                    "name": "Y",
+                    "description": "The matrix to be used as the label data for training.",
+                    "type": "Matrix"
+                },
+                {
+                    "name": "X",
+                    "description": "The matrix to be used as the input data for training.",
+                    "type": "Matrix"
+                }
+            ],
+            "class": ""
+        }
+    ],
+    "warnings": [
+        {
+            "message": "Missing item type\nRandomize matrix element order in-place.\nUsing Durstenfeld shuffle algorithm.",
+            "line": " softmax.js:357"
+        }
+    ]
+}
