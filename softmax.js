@@ -8,7 +8,8 @@ class SoftmaxRegression {
 
   /**
    * This method serves as the constructor for the SoftmaxRegression class.
-   * @method constructor
+   * @class SoftmaxRregression
+   * @constructor
    * @param {Object} args These are the required arguments.
    * @param {Number} args.learningRate Learning rate for BackPropogation.
    * @param {Number} args.threshold Threshold value for cost.
