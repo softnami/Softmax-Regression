@@ -91,6 +91,14 @@ class SoftmaxRegression {
    * This method serves as the constructor for the SoftmaxRegression class.
    * @method constructor
    * @param {Object} args These are the required arguments.
+   * @param {Number} args.learningRate Learning rate for BackPropogation.
+   * @param {Number} args.threshold Threshold value for cost.
+   * @param {Number} args.regularization_parameter Regularization parameter to prevent overfitting. 
+   * @param {Number} args.notify_count Value to execute the iteration_callback after every x number of epochs. 
+   * @param {Function} args.iteration_callback Callback that can be used for getting cost and epoch value on every notify count. 
+   * @param {Number} args.maximum_epochs Maximum epochs to be allowed before the optimization is complete. Defaults to 1000.
+   * @param {Array} args.weight_initilization_range Array contains the lower bound and upper bound for random weight initilization: [lower bound, upper bound].
+   * @param {Array} args.parameter_size Array contains the number of input features and total number of output classes: [number of  input features, total number of  output classes].
    */
   constructor(args) {
     if (args.notify_count === undefined || args.weight_initialization_range === undefined || args.threshold === undefined || args.momentum === undefined || args.batch_size === undefined || args.learningRate === undefined || args.parameter_size === undefined || args.max_epochs === undefined || args.iteration_callback === undefined) {
@@ -107,7 +115,6 @@ class SoftmaxRegression {
       this.MathJS = math;
       this.q = Q;
     }
-    this.MathJS = require(&#x27;mathjs&#x27;);
     this.initArgs = args;
     this.batch_size = this.initArgs.batch_size;
     this.momentum = this.initArgs.momentum;
@@ -510,7 +517,7 @@ saveWeights(weights, biases) {
          counter = 0;
       }
 
-      if (scope.epochs &gt; this.max_epochs || (scope.cost &lt; this.threshold &amp;&amp; scope.cost &gt; 0)) {
+      if (scope.epochs &gt;= this.max_epochs || (scope.cost &lt; this.threshold &amp;&amp; scope.cost &gt; 0)) {
         console.log(&quot;\nTraining completed.\n&quot;);
         this.saveWeights(this.W, this.bias);
         return new Promise((resolve, reject) =&gt; {
