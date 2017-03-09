@@ -416,7 +416,7 @@ describe('Softmax', function() {
       let success = false;
 
       softmax.startRegression(X, Y).then(function(data) {
-        if ((data.cost <= (1 / mathjs.exp(3))) || (data.cost < (getInitParams.threshold)) || (data.epochs - 1) === getInitParams.max_epochs) {
+        if ((data.cost <= (1 / mathjs.exp(3))) || (data.cost < (getInitParams.threshold)) || (data.epochs) === getInitParams.max_epochs) {
           success = true;
         }
         assert.equal(success, true);
