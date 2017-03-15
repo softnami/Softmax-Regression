@@ -363,8 +363,7 @@ saveWeights(weights, biases) {
 
 
 /**
-* Randomize matrix element order in-place.
-* Using Durstenfeld shuffle algorithm.
+* Randomize matrix element order in-place using Durstenfeld shuffle algorithm.
 */
  shufflematrix(matrix, matrix2) {
             for (var i = matrix.length - 1; i > 0; i--) {

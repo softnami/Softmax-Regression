@@ -15742,12 +15742,12 @@
         {
             "file": "softmax.js",
             "line": 365,
-            "description": "Randomize matrix element order in-place.\nUsing Durstenfeld shuffle algorithm.",
+            "description": "Randomize matrix element order in-place using Durstenfeld shuffle algorithm.",
             "class": "SoftmaxRregression"
         },
         {
             "file": "softmax.js",
-            "line": 385,
+            "line": 384,
             "description": "This method serves as the logic for the gradient descent.",
             "itemtype": "method",
             "name": "startRegression",
@@ -23096,7 +23096,7 @@
             "line": " lib/q.js:1901"
         },
         {
-            "message": "Missing item type\nRandomize matrix element order in-place.\nUsing Durstenfeld shuffle algorithm.",
+            "message": "Missing item type\nRandomize matrix element order in-place using Durstenfeld shuffle algorithm.",
             "line": " softmax.js:365"
         }
     ]
