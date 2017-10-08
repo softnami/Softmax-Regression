@@ -1,10 +1,8 @@
 "use strict";
 
-let window_object = (function(g){
-      return g;
-  }(this));
+import * as math from 'mathjs';
 
-class SoftmaxRegression {
+export class SoftmaxRegression {
 
   /**
    * This method serves as the constructor for the SoftmaxRegression class.
@@ -28,14 +26,8 @@ class SoftmaxRegression {
       });
     }
 
-    if (Object.keys(window_object).length === 0) {
-      this.MathJS = require('mathjs');
-      this.q = require('q');
-    } else {
-      this.MathJS = math;
-      this.q = Q;
-    }
     this.initArgs = args;
+    this.MathJS = math;
     this.batch_size = this.initArgs.batch_size;
     this.momentum = this.initArgs.momentum;
     this.notify_count = this.initArgs.notify_count;
@@ -123,13 +115,13 @@ class SoftmaxRegression {
    */
   costFunction(_W, _X, _Y) {
 
-    var cost = 0,
+    let cost = 0,
       exp_matrix, probability_matrx = [];
-    var W = _W || this.W;
-    var X = _X || this.X;
-    var Y = _Y || this.Y;
+    let W = _W || this.W;
+    let X = _X || this.X;
+    let Y = _Y || this.Y;
 
-    var scope = {};
+    let scope = {};
     scope.cost = 0;
     scope.cost_n = 0;
     exp_matrix = this.exp_matrix(W, X);
@@ -174,13 +166,13 @@ class SoftmaxRegression {
    * @return {matrix} Returns the cost gradient.
    */
   costFunctionGradient(_W, _X, _Y) {
-    var cost = 0;
-    var gradient = [],
+    let cost = 0;
+    let gradient = [],
       probability_matrx = [],
       exp_matrix;
-    var X = _X || this.X;
-    var Y = _Y || this.Y;
-    var W = _W || this.W;
+    let X = _X || this.X;
+    let Y = _Y || this.Y;
+    let W = _W || this.W;
     W = this.MathJS.squeeze(W);
 
     exp_matrix = this.exp_matrix(W, X);
@@ -220,7 +212,7 @@ class SoftmaxRegression {
    * @method validateXYW
    **/
   validateXYW() {
-    var self = this;
+    let self = this;
 
     if (self.X.size()[1] != self.W.size()[0]) {
       throw ({
@@ -320,24 +312,20 @@ setBias(bias) {
  * @return {Object} Returns a resolved promise after successfuly setting weights and biases.
  */
  setWeights(){
-  var self = this;
-  var weights, biases;
-  if (Object.keys(window_object).length === 0) {
-    weights = JSON.parse(global.localStorage.getItem("Weights"));
-    biases = JSON.parse(global.localStorage.getItem("Biases"));
-  } else {
+    let self = this;
+    let weights, biases;
+
     weights = JSON.parse(localStorage.getItem("Weights"));
     biases = JSON.parse(localStorage.getItem("Biases"));
-  }
 
-if(weights!==null && weights!==undefined){
+    if(weights!==null && weights!==undefined){
 
-  self.W = this.MathJS.matrix(weights.data);
-  self.bias= this.MathJS.matrix(biases.data);
-  return [self.W._data, self.bias];
-}
+      self.W = this.MathJS.matrix(weights.data);
+      self.bias= this.MathJS.matrix(biases.data);
+      return [self.W._data, self.bias];
+    }
 
-  return [];
+    return [];
 }
 
 
@@ -350,13 +338,10 @@ if(weights!==null && weights!==undefined){
  * @return {Boolean} Returns true after succesfuly saving the weights.
  */
 saveWeights(weights, biases) {
-  if (Object.keys(window_object).length === 0) {
-    global.localStorage.setItem("Weights", JSON.stringify(weights));
-    global.localStorage.setItem("Biases", JSON.stringify(biases));
-  } else {
-    localStorage.setItem("Weights", JSON.stringify(weights));
-    localStorage.setItem("Biases", JSON.stringify(biases));
-  }
+ 
+  localStorage.setItem("Weights", JSON.stringify(weights));
+  localStorage.setItem("Biases", JSON.stringify(biases));
+
   console.log("\nWeights were successfuly saved.");
   return true;
 }
@@ -366,14 +351,14 @@ saveWeights(weights, biases) {
 * Randomize matrix element order in-place using Durstenfeld shuffle algorithm.
 */
  shufflematrix(matrix, matrix2) {
-            for (var i = matrix.length - 1; i > 0; i--) {
-                var j = Math.floor(Math.random() * (i + 1));
+            for (let i = matrix.length - 1; i > 0; i--) {
+                let j = Math.floor(Math.random() * (i + 1));
                 
-                var temp = matrix[i];
+                let temp = matrix[i];
                 matrix[i] = matrix[j];
                 matrix[j] = temp;
 
-                var temp2 = matrix2[i];
+                let temp2 = matrix2[i];
                 matrix2[i] = matrix2[j];
                 matrix2[j] = temp2;
             }
@@ -389,13 +374,13 @@ saveWeights(weights, biases) {
    * @param {matrix} X The matrix to be used as the input data for training.
    */
   startRegression(X, Y) {
-    var iterations = 0,
+    let iterations = 0,
       counter = 0;
-    var scope = {};
+    let scope = {};
 
     this.X = X;
     this.Y = Y;
-    var self = this;
+    let self = this;
     this.W = this.MathJS.random(this.MathJS.matrix([self.parameter_size[0], self.parameter_size[1]]), this.weight_initialization_range[0], this.weight_initialization_range[1]);
     this.bias = this.MathJS.matrix([this.MathJS.ones(self.parameter_size[1])._data]);
     scope.v = this.MathJS.random(this.MathJS.matrix([self.parameter_size[0], self.parameter_size[1]]), 0, 0);
@@ -411,7 +396,7 @@ saveWeights(weights, biases) {
       scope.Y = this.MathJS.matrix(this.Y._data.slice(counter * this.batch_size, counter * this.batch_size + this.batch_size));
       scope.gamma = this.momentum;
 
-      var gradinfo = this.costFunctionGradient(undefined, scope.X, scope.Y);
+      let gradinfo = this.costFunctionGradient(undefined, scope.X, scope.Y);
 
       scope.gradient = gradinfo[0];
       scope.bias_update = gradinfo[1];
@@ -430,7 +415,7 @@ saveWeights(weights, biases) {
         scope.cost = this.costFunction(undefined, scope.X, scope.Y);
         scope.epochs++;
         this.iteration_callback(scope);
-        var shuffled = this.shufflematrix(this.X._data, this.Y._data);
+        let shuffled = this.shufflematrix(this.X._data, this.Y._data);
         this.X = this.MathJS.matrix(shuffled[0]);
         this.Y = this.MathJS.matrix(shuffled[1]);
          counter = 0;
@@ -447,11 +432,4 @@ saveWeights(weights, biases) {
   }
 
 }
-
-if(Object.keys(window_object).length === 0){
-    module.exports = SoftmaxRegression;
-}else{
-    window['SoftmaxRegression'] = SoftmaxRegression;
-}
-
 

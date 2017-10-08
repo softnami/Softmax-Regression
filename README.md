@@ -10,18 +10,19 @@ This module contains logic to run the Softmax Regression algorithm.
 * nodeJS License: https://github.com/nodejs/node/blob/master/LICENSE
 
 ##Installation:
-*  Download the project and unzip it.
-*  Copy the 'softmaxregression' folder to your node_modules folder in your project directory.
+*  run 'npm i @softnami/softmaxregression'
 
 ###Sample usage:
 
 ```javascript
-var epoch = 1
-var callback = function(data) {
+import {SoftmaxRegression} from '@softnami/softmaxregression';
+
+let epoch = 1;
+let callback = function(data) {
     console.log(data);
 };
 
-var sft = new window.SoftmaxRegression({
+let sft = new SoftmaxRegression({
     'notify_count': 1,
     'momentum': 0.5,
     'parameter_size': [78, 12], //[number of  input features, total number of  output classes]
@@ -34,7 +35,7 @@ var sft = new window.SoftmaxRegression({
     'regularization_parameter': Math.exp(-4)
   });
 
-var sample_y = []; //one-hot encoded classes: [1,2,3] -> [[1, 0,0],[0, 1,0],[0, 0,1]]
+let sample_y = []; //one-hot encoded classes: [1,2,3] -> [[1, 0,0],[0, 1,0],[0, 0,1]]
 
 for(let i =0 ; i< 100; i++){
   sample_y[i] = [];
@@ -49,7 +50,7 @@ for(let i =0 ; i< 100; i++){
 }
 
 
-var y = [],
+let y = [],
   num = 0;
 
 
@@ -58,26 +59,10 @@ for (let i = 0; i < 1000; i++) {
   y.push(sample_y[num]);
 }
 
-var x = (math.random(math.matrix([1000, 78]), -1, 1));
+let x = (math.random(math.matrix([1000, 78]), -1, 1));
 
 console.log('Start training.');
 sft.startRegression(x, math.matrix(y));
-```
-<!--index.html-->
-<!doctype html>
-<html>
-  <head>
-  </head>
-  <body >
-        <script src="softmaxression/lib/q.js"></script>
-        <script src="softmaxregression/lib/math.js"></script>
-        <script src="softmaxregression/softmax.js"></script>
-         <!--Include the main.js file where you use the algorithm.-->
-+        <script src="main.js"></script>
-</body>
-</html>
-
-*/
 ```
 
 ##Testing:

@@ -1,11 +1,12 @@
 'use strict';
 
-let Softmax = require('../softmax');
+import {SoftmaxRegression} from '../softmax';
+
 let assert = require('assert');
 let mathjs = require('mathjs');
 let sinon = require('sinon');
 
-describe('Softmax', function() {
+describe('SoftmaxRegression', function() {
 
   global.localStorage = (function() {
     let storage = {};
@@ -37,7 +38,7 @@ describe('Softmax', function() {
     console.log('Epochs:' + data.epochs, 'iterations:' + data.iterations, 'cost: ' + data.cost);
   }
 
-  let softmax = new Softmax({
+  let softmax = new SoftmaxRegression({
     'notify_count': 1,
     'momentum': 0.5,
     'parameter_size': [78, 12], //[number of  input features, total number of  output classes]
