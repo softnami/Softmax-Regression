@@ -17,7 +17,6 @@ This module contains logic to run the Softmax Regression algorithm.
 ```javascript
 import {SoftmaxRegression} from '@softnami/softmaxregression';
 
-let epoch = 1;
 let callback = function(data) {
     console.log(data);
 };
@@ -67,9 +66,7 @@ sft.startRegression(x, math.matrix(y));
 
 ##Testing:
 * For unit testing Mocha and Sinon have been used. 
-* On newer computers run the command 'mocha --timeout 50000', the 50000 ms timeout is to give enough time for tests to complete as they might not process before timeout. 
-* On older computers run the command 'mocha --timeout 300000', the 300000 ms timeout is to give enough time for tests to complete as they might not process before timeout on older computers. 
-* If need be more than 300000 ms should be used to run the tests depending on the processing power of the computer. 
+* Run 'npm test', if timeout occurs then increase timeout in test script.
 
 
 ##Documentation
