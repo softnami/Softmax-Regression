@@ -6,7 +6,7 @@
   "dependencies": {
     "csv-parse": "^1.0.1",
     "fs": "0.0.2",
-    "mathjs": "^2.7.0",
+    "mathjs": "^3.17.0",
     "yuidocjs": "^0.9.0"
   },
   "devDependencies": {
