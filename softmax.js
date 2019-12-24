@@ -212,30 +212,28 @@ export class SoftmaxRegression {
    * @method validateXYW
    **/
   validateXYW() {
-    let self = this;
-
-    if (self.X.size()[1] != self.W.size()[0]) {
+    if (this.X.size()[1] != this.W.size()[0]) {
       throw ({
         'name': "Invalid size",
         'message': "The number of columns in X should be equal to the number of rows in parameter_size."
       });
     }
 
-    if (self.Y.size()[1] != self.W.size()[1]) {
+    if (this.Y.size()[1] != this.W.size()[1]) {
       throw ({
         'name': "Invalid size",
         'message': "The number of columns in Y should be equal to the number of columns in parameter_size."
       });
     }
 
-    if (self.Y.size()[0] != self.X.size()[0]) {
+    if (this.Y.size()[0] != this.X.size()[0]) {
       throw ({
         'name': "Invalid size",
         'message': "The number of rows in X should be equal to the number of rows in Y."
       });
     }
 
-    if (!(self.Y.size()[0] > 2) || !(self.X.size()[0] > 2)) {
+    if (!(this.Y.size()[0] > 2) || !(this.X.size()[0] > 2)) {
       throw ({
         'name': "Invalid size",
         'message': "The number of rows in X andy Y should be greater than 2."
@@ -312,7 +310,6 @@ setBias(bias) {
  * @return {Object} Returns a resolved promise after successfuly setting weights and biases.
  */
  setWeights(){
-    let self = this;
     let weights, biases;
 
     weights = JSON.parse(localStorage.getItem("Weights"));
@@ -320,9 +317,9 @@ setBias(bias) {
 
     if(weights!==null && weights!==undefined){
 
-      self.W = this.MathJS.matrix(weights.data);
-      self.bias= this.MathJS.matrix(biases.data);
-      return [self.W._data, self.bias];
+      this.W = this.MathJS.matrix(weights.data);
+      this.bias= this.MathJS.matrix(biases.data);
+      return [this.W._data, this.bias];
     }
 
     return [];
@@ -338,7 +335,6 @@ setBias(bias) {
  * @return {Boolean} Returns true after succesfuly saving the weights.
  */
 saveWeights(weights, biases) {
- 
   localStorage.setItem("Weights", JSON.stringify(weights));
   localStorage.setItem("Biases", JSON.stringify(biases));
 
@@ -351,18 +347,18 @@ saveWeights(weights, biases) {
 * Randomize matrix element order in-place using Durstenfeld shuffle algorithm.
 */
  shufflematrix(matrix, matrix2) {
-            for (let i = matrix.length - 1; i > 0; i--) {
-                let j = Math.floor(Math.random() * (i + 1));
-                
-                let temp = matrix[i];
-                matrix[i] = matrix[j];
-                matrix[j] = temp;
+    for (let i = matrix.length - 1; i > 0; i--) {
+        let j = Math.floor(Math.random() * (i + 1));
+        
+        let temp = matrix[i];
+        matrix[i] = matrix[j];
+        matrix[j] = temp;
 
-                let temp2 = matrix2[i];
-                matrix2[i] = matrix2[j];
-                matrix2[j] = temp2;
-            }
-            return [matrix, matrix2];
+        let temp2 = matrix2[i];
+        matrix2[i] = matrix2[j];
+        matrix2[j] = temp2;
+    }
+    return [matrix, matrix2];
   }
 
 
@@ -380,10 +376,9 @@ saveWeights(weights, biases) {
 
     this.X = X;
     this.Y = Y;
-    let self = this;
-    this.W = this.MathJS.random(this.MathJS.matrix([self.parameter_size[0], self.parameter_size[1]]), this.weight_initialization_range[0], this.weight_initialization_range[1]);
-    this.bias = this.MathJS.matrix([this.MathJS.ones(self.parameter_size[1])._data]);
-    scope.v = this.MathJS.random(this.MathJS.matrix([self.parameter_size[0], self.parameter_size[1]]), 0, 0);
+    this.W = this.MathJS.random(this.MathJS.matrix([this.parameter_size[0], this.parameter_size[1]]), this.weight_initialization_range[0], this.weight_initialization_range[1]);
+    this.bias = this.MathJS.matrix([this.MathJS.ones(this.parameter_size[1])._data]);
+    scope.v = this.MathJS.random(this.MathJS.matrix([this.parameter_size[0], this.parameter_size[1]]), 0, 0);
     scope.epochs = 0;
     scope.W = this.W;
     scope.cost = 0;
@@ -391,7 +386,7 @@ saveWeights(weights, biases) {
 
     while (true) {
 
-      this.W._data[0] = this.MathJS.zeros(1, self.parameter_size[1])._data[0];
+      this.W._data[0] = this.MathJS.zeros(1, this.parameter_size[1])._data[0];
       scope.X = this.MathJS.matrix(this.X._data.slice(counter * this.batch_size, counter * this.batch_size + this.batch_size));
       scope.Y = this.MathJS.matrix(this.Y._data.slice(counter * this.batch_size, counter * this.batch_size + this.batch_size));
       scope.gamma = this.momentum;

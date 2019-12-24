@@ -16,12 +16,38 @@ This module contains logic to run the Softmax Regression algorithm.
 
 ```javascript
 import {SoftmaxRegression} from '@softnami/softmaxregression';
+import * as math from 'mathjs';
 
-let callback = function(data) {
+const callback = function(data) {
     console.log(data);
 };
 
-let sft = new SoftmaxRegression({
+const generateData = ()=>{
+    let sample_y = []; //one-hot encoded classes: [1,2,3] -> [[1, 0,0],[0, 1,0],[0, 0,1]]
+    let y = [], num = 0, 
+    x = (math.random(math.matrix([1000, 78]), -1, 1));
+
+    for(let i =0 ; i< 100; i++){
+      sample_y[i] = [];
+      for(let j =0; j< 12; j++){
+        if(i==j){
+          sample_y[i][j]= 1;
+        }
+        else{
+          sample_y[i][j]= 0;
+        }
+      }  
+    }
+
+    for (let i = 0; i < 1000; i++) {
+      num = Math.floor((Math.random() * 100) + 0);
+      y.push(sample_y[num]);
+    }
+
+    return [x, y];
+};
+
+const softmaxRegression = new SoftmaxRegression({
     'notify_count': 1,
     'momentum': 0.5,
     'parameter_size': [78, 12], //[number of  input features, total number of  output classes]
@@ -34,34 +60,11 @@ let sft = new SoftmaxRegression({
     'regularization_parameter': Math.exp(-4)
   });
 
-let sample_y = []; //one-hot encoded classes: [1,2,3] -> [[1, 0,0],[0, 1,0],[0, 0,1]]
-
-for(let i =0 ; i< 100; i++){
-  sample_y[i] = [];
-  for(let j =0; j< 12; j++){
-    if(i==j){
-      sample_y[i][j]= 1;
-    }
-    else{
-      sample_y[i][j]= 0;
-    }
-  }  
-}
-
-
-let y = [],
-  num = 0;
-
-
-for (let i = 0; i < 1000; i++) {
-  num = Math.floor((Math.random() * 100) + 0);
-  y.push(sample_y[num]);
-}
-
-let x = (math.random(math.matrix([1000, 78]), -1, 1));
+let [x, y] = generateData();
 
 console.log('Start training.');
-sft.startRegression(x, math.matrix(y));
+softmaxRegression.startRegression(x, math.matrix(y));
+
 ```
 
 ##Testing:
