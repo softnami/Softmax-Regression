@@ -1,8 +1,8 @@
 # Softmax Regression
-###[Author: Hussain Mir Ali]
+### [Author: Hussain Mir Ali]
 This module contains logic to run the Softmax Regression algorithm.
 
-##External Libraries Used:
+## External Libraries Used:
 * math License: https://github.com/josdejong/math/blob/master/LICENSE
 * mocha License: https://github.com/mochajs/mocha/blob/master/LICENSE
 * sinon Licencse: https://github.com/sinonjs/sinon/blob/master/LICENSE
