@@ -1,6 +1,6 @@
 {
   "name": "@softnami/softmaxregression",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "A JavaScript module for Softmax Regression.",
   "main": "softmax.js",
   "dependencies": {
@@ -20,6 +20,9 @@
     "nodemon": "^1.19.4",
     "sinon": "^8.0.1"
   },
+  "repository": {"type": "git", 
+  "url": "https://github.com/softnami/Softmax-Regression.git"},
+  "homepage": "https://github.com/softnami/Softmax-Regression",
   "keywords": [
     "softmax regression",
     "softmax",
