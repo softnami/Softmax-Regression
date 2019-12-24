@@ -9,16 +9,16 @@ This module contains logic to run the Softmax Regression algorithm.
 * yuidocjs License: https://github.com/yui/yuidoc/blob/master/LICENSE
 * nodeJS License: https://github.com/nodejs/node/blob/master/LICENSE
 
-##Installation:
+## Installation:
 *  run 'npm i @softnami/softmaxregression'
 
-###Sample usage:
+### Sample usage:
 
 ```javascript
 import {SoftmaxRegression} from '@softnami/softmaxregression';
 import * as math from 'mathjs';
 
-const callback = function(data) {
+const callback = (data)=> {
     console.log(data);
 };
 
@@ -67,12 +67,12 @@ softmaxRegression.startRegression(x, math.matrix(y));
 
 ```
 
-##Testing:
+## Testing:
 * For unit testing Mocha and Sinon have been used. 
 * Run 'npm test', if timeout occurs then increase timeout in test script.
 
 
-##Documentation
+## Documentation
 *  The documentation is available in the 'out' folder of this project. Open the 'index.html' file under the 'out' folder with Crhome or Firefox.
 *  To generate the documentation run 'yuidoc .' command in the main directory of this project.
 
