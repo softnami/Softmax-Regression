@@ -1,6 +1,6 @@
 {
   "name": "@softnami/softmaxregression",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "A JavaScript module for Softmax Regression.",
   "main": "softmax.js",
   "dependencies": {
