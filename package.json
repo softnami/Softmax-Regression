@@ -1,6 +1,6 @@
 {
   "name": "@softnami/softmaxregression",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "A JavaScript module for Softmax Regression.",
   "main": "softmax.js",
   "dependencies": {
@@ -20,6 +20,14 @@
     "nodemon": "^1.19.4",
     "sinon": "^8.0.1"
   },
+  "keywords": [
+    "softmax regression",
+    "softmax",
+    "machine learning",
+    "javascript machine learning",
+    "softmax regression browser",
+    "softmax regression es6"
+  ],
   "scripts": {
     "test": "./node_modules/.bin/mocha --require ./node_modules/@babel/register --timeout 30000"
   },
