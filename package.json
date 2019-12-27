@@ -1,8 +1,9 @@
 {
   "name": "@softnami/softmaxregression",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "A JavaScript module for Softmax Regression.",
   "main": "softmax.js",
+  "license": "mit",
   "dependencies": {
     "csv-parse": "^4.8.2",
     "fs": "0.0.2",
