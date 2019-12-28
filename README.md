@@ -76,7 +76,7 @@ softmaxRegression.startRegression(x, math.matrix(y));
 *  To generate the documentation install 'yuidocjs' globally then run 'yuidoc .' command in the main directory of this project.
 
 ## Theory and Background:
-* Find more about how softmax regression works and the theory behined it. Visit [https://www.kdnuggets.com/](https://www.kdnuggets.com/2016/07/softmax-regression-related-logistic-regression.html).
+* Find more about how softmax regression works and the theory behind it. Visit [https://www.kdnuggets.com/](https://www.kdnuggets.com/2016/07/softmax-regression-related-logistic-regression.html).
 
 
 ## 💡 Practice Daily Coding 
