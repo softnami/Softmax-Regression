@@ -66,7 +66,6 @@ console.log('Start training.');
 softmaxRegression.startRegression(x, math.matrix(y));
 
 ```
-
 ## Testing:
 * For unit testing Mocha and Sinon have been used. 
 * Run 'npm test', if timeout occurs then increase timeout in test script.
@@ -74,6 +73,11 @@ softmaxRegression.startRegression(x, math.matrix(y));
 
 ## Documentation
 *  The documentation is available in the 'out' folder of this project. Open the 'index.html' file under the 'out' folder with Crhome or Firefox.
-*  To generate the documentation run 'yuidoc .' command in the main directory of this project.
+*  To generate the documentation install 'yuidocjs' globally then run 'yuidoc .' command in the main directory of this project.
+
+## Theory and Background:
+* Find more about how softmax regression works and the theory behined it. Visit [https://www.kdnuggets.com/](https://www.kdnuggets.com/2016/07/softmax-regression-related-logistic-regression.html).
 
 
+## 💡 Practice Daily Coding 
+* Practice coding questions from top companies daily, visit [softnami.com/dailycoding](https://www.softnami.com/dailycoding/signup.html?ref=npm)
